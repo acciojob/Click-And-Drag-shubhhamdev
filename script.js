@@ -1,27 +1,17 @@
-// Your code here.
-const items = document.querySelector('.items');
-let isDragging = false;
-let startPosX = 0;
-let scrollLeft = 0;
+it('should simulate click and drag to scroll', () => {
+  cy.get('.items').should('be.visible').then($items => {
+    const startPosX = 493;
+    const endPosX = 271;
 
-items.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  startPosX = e.pageX - items.offsetLeft;
-  scrollLeft = items.scrollLeft;
-});
+    cy.wrap($items)
+      .trigger('mousedown', { which: 1, pageX: startPosX, pageY: 391 })
+      .trigger('mousemove', { which: 1, pageX: endPosX, pageY: 391 })
+      .trigger('mouseup');
 
-items.addEventListener('mouseleave', () => {
-  isDragging = false;
-});
+    cy.wait(1000); // Adjust this delay as needed
 
-items.addEventListener('mouseup', () => {
-  isDragging = false;
-});
-
-items.addEventListener('mousemove', (e) => {
-  if (!isDragging) return;
-  e.preventDefault();
-  const x = e.pageX - items.offsetLeft;
-  const walk = (x - startPosX) * 3; // Adjust the sliding speed
-  items.scrollLeft = scrollLeft - walk;
+    cy.wrap($items).should($items => {
+      expect($items[0].scrollLeft).to.greaterThan(0);
+    });
+  });
 });
