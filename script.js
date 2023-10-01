@@ -1,17 +1,29 @@
-it('should simulate click and drag to scroll', () => {
-  cy.get('.items').should('be.visible').then($items => {
-    const startPosX = 493;
-    const endPosX = 271;
+const slider = document.querySelector('.items');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
 
-    cy.wrap($items)
-      .trigger('mousedown', { which: 1, pageX: startPosX, pageY: 391 })
-      .trigger('mousemove', { which: 1, pageX: endPosX, pageY: 391 })
-      .trigger('mouseup');
-
-    cy.wait(1000); // Adjust this delay as needed
-
-    cy.wrap($items).should($items => {
-      expect($items[0].scrollLeft).to.greaterThan(0);
+    slider.addEventListener('mousedown', (event) => {
+        isDown = true;
+        slider.classList.add('active')
+        startX = event.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
     });
-  });
-});
+    
+    slider.addEventListener('mouseleave', () => {
+        isDown = false;
+        slider.classList.remove('active')
+    });
+
+    slider.addEventListener('mouseup', () => {
+        isDown = false;
+        slider.classList.remove('active')
+    });
+
+    slider.addEventListener('mousemove', (event) => {
+        if (!isDown) return;
+        event.preventDefault();
+        const x = event.pageX - slider.offsetLeft;
+        const walk = (x - startX)*2;
+        slider.scrollLeft = scrollLeft - walk;
+    });
